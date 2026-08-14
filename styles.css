@@ -226,3 +226,14 @@
     transition: transform 0.2s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.2s ease;
     will-change: transform;
 }
+
+/* Before / After Drag Slider Dynamic Width Container Query */
+#before-after-container {
+    container-type: inline-size;
+}
+
+#after-inner-card {
+    width: 100cqw;
+    max-width: 100%;
+}
+
