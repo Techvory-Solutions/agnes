@@ -1,0 +1,228 @@
+/* Agnes AI — Advanced Motion & Interactive Animation Suite */
+
+/* Custom Animations & Keyframes */
+@keyframes blink {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0; }
+}
+
+.animate-blink {
+    animation: blink 1s step-end infinite;
+}
+
+/* Top Scroll Progress Indicator Bar */
+#scroll-progress {
+    position: fixed;
+    top: 0;
+    left: 0;
+    height: 3.5px;
+    background: linear-gradient(90deg, #22d3ee, #3b82f6, #a855f7, #22d3ee);
+    background-size: 300% 100%;
+    z-index: 9999;
+    width: 0%;
+    transition: width 0.1s linear;
+    box-shadow: 0 0 12px rgba(34, 211, 238, 0.8), 0 0 4px rgba(168, 85, 247, 0.6);
+    animation: progressGlow 4s linear infinite;
+}
+
+@keyframes progressGlow {
+    0% { background-position: 0% 50%; }
+    100% { background-position: 100% 50%; }
+}
+
+/* Custom Scrollbar Styles */
+::-webkit-scrollbar {
+    width: 8px;
+}
+
+::-webkit-scrollbar-track {
+    background: var(--bg-color);
+}
+
+::-webkit-scrollbar-thumb {
+    background: #cbd5e1;
+    border-radius: 4px;
+}
+
+[data-theme="dark"] ::-webkit-scrollbar-thumb {
+    background: #333;
+}
+
+/* Shimmering Animated Text Gradient */
+.text-gradient-animated {
+    background: linear-gradient(135deg, #22d3ee 0%, #3b82f6 30%, #a855f7 70%, #22d3ee 100%);
+    background-size: 200% auto;
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+    animation: textShimmer 4s linear infinite;
+}
+
+@keyframes textShimmer {
+    0% { background-position: 0% 50%; }
+    50% { background-position: 100% 50%; }
+    100% { background-position: 0% 50%; }
+}
+
+/* Glassmorphism & Interactive Mouse Spotlight Panel */
+.glass-panel {
+    position: relative;
+    background: var(--glass-bg);
+    backdrop-filter: blur(14px);
+    -webkit-backdrop-filter: blur(14px);
+    border: 1px solid var(--glass-border);
+    box-shadow: 0 4px 20px -2px rgba(0, 0, 0, 0.25);
+    transition: transform 0.35s cubic-bezier(0.25, 1, 0.5, 1), 
+                box-shadow 0.35s ease, 
+                border-color 0.35s ease;
+    overflow: hidden;
+}
+
+.glass-panel::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(
+        450px circle at var(--mouse-x, 50%) var(--mouse-y, 50%),
+        rgba(34, 211, 238, 0.15),
+        rgba(59, 130, 246, 0.05) 50%,
+        transparent 80%
+    );
+    opacity: 0;
+    transition: opacity 0.4s ease;
+    pointer-events: none;
+    z-index: 1;
+}
+
+.glass-panel:hover::before {
+    opacity: 1;
+}
+
+/* 3D Tilt Card Base */
+.card-tilt {
+    transform-style: preserve-3d;
+    will-change: transform;
+    transition: transform 0.15s cubic-bezier(0.2, 0, 0.2, 1);
+}
+
+/* Border Beam Effect (Rotating Conic Glow) */
+.border-beam {
+    position: relative;
+    z-index: 1;
+}
+
+@property --beam-angle {
+    syntax: '<angle>';
+    initial-value: 0deg;
+    inherits: false;
+}
+
+.border-beam::after {
+    content: '';
+    position: absolute;
+    inset: -1.5px;
+    border-radius: inherit;
+    padding: 1.5px;
+    background: conic-gradient(from var(--beam-angle, 0deg), transparent 70%, #22d3ee 88%, #a855f7 100%);
+    -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+    -webkit-mask-composite: xor;
+    mask-composite: exclude;
+    pointer-events: none;
+    animation: rotateBeam 4s linear infinite;
+    z-index: 2;
+}
+
+@keyframes rotateBeam {
+    to {
+        --beam-angle: 360deg;
+    }
+}
+
+/* Soundwave AI Visualizer Animation */
+.soundwave {
+    display: inline-flex;
+    align-items: center;
+    gap: 3px;
+    height: 14px;
+}
+
+.soundwave-bar {
+    width: 3px;
+    background: #22d3ee;
+    border-radius: 2px;
+    animation: soundwaveBounce 1.2s ease-in-out infinite alternate;
+}
+
+.soundwave-bar:nth-child(1) { height: 40%; animation-delay: 0.1s; }
+.soundwave-bar:nth-child(2) { height: 85%; animation-delay: 0.35s; }
+.soundwave-bar:nth-child(3) { height: 100%; animation-delay: 0.2s; }
+.soundwave-bar:nth-child(4) { height: 60%; animation-delay: 0.45s; }
+
+@keyframes soundwaveBounce {
+    0% { transform: scaleY(0.25); }
+    100% { transform: scaleY(1); }
+}
+
+/* Enhanced Scroll Reveal Animations */
+.reveal {
+    opacity: 0;
+    transform: translateY(32px);
+    transition: opacity 0.8s cubic-bezier(0.16, 1, 0.3, 1), transform 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+    will-change: opacity, transform;
+}
+
+.reveal-left {
+    opacity: 0;
+    transform: translateX(-40px);
+    transition: opacity 0.8s cubic-bezier(0.16, 1, 0.3, 1), transform 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+    will-change: opacity, transform;
+}
+
+.reveal-right {
+    opacity: 0;
+    transform: translateX(40px);
+    transition: opacity 0.8s cubic-bezier(0.16, 1, 0.3, 1), transform 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+    will-change: opacity, transform;
+}
+
+.reveal-scale {
+    opacity: 0;
+    transform: scale(0.92);
+    transition: opacity 0.8s cubic-bezier(0.16, 1, 0.3, 1), transform 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+    will-change: opacity, transform;
+}
+
+.reveal.active,
+.reveal-left.active,
+.reveal-right.active,
+.reveal-scale.active {
+    opacity: 1;
+    transform: translateY(0) translateX(0) scale(1);
+}
+
+/* Background Ambient Blobs */
+.blob-bg {
+    position: absolute;
+    filter: blur(90px);
+    z-index: -1;
+    opacity: 0.85;
+    border-radius: 50%;
+    animation: blob 10s ease-in-out infinite;
+    will-change: transform;
+}
+
+/* Background Particle Canvas */
+#hero-particle-canvas {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+    z-index: -2;
+}
+
+/* Magnetic Button Effect */
+.btn-magnetic {
+    transition: transform 0.2s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.2s ease;
+    will-change: transform;
+}
