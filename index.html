@@ -1185,15 +1185,23 @@
             // separate domain and cross-domain measurement may suppress GA4's
             // automatic outbound "click" event.
             function trackCtaClicks() {
-                document.querySelectorAll('[data-cta]').forEach(link => {
+                // Track all links to the Agnes app/broker app. This intentionally
+                // does not depend on data-cta attributes, so it works even if
+                // the HTML has not been annotated individually.
+                document.querySelectorAll('a[href*="app.agnes.techvory.in"]').forEach(link => {
                     link.addEventListener('click', function () {
                         const attribution = {
                             ...getStoredAttribution(),
                             ...currentAttribution
                         };
 
+                        const url = new URL(this.href);
+                        const isBroker = url.pathname.startsWith('/broker');
+                        const ctaName = isBroker ? 'broker_dashboard' : 'try_agnes';
+
+                        console.debug('[GA4] cta_click', ctaName, this.href);
                         gtag('event', 'cta_click', {
-                            cta_name: this.dataset.cta,
+                            cta_name: ctaName,
                             link_id: this.id || undefined,
                             link_url: this.href,
                             link_text: (this.textContent || '').trim(),
