@@ -76,7 +76,11 @@
   function gtag(){dataLayer.push(arguments);}
   gtag('js', new Date());
 
-  gtag('config', 'G-3DB16Z56BT');
+  gtag('config', 'G-3DB16Z56BT', {
+    linker: {
+      domains: ['app.agnes.techvory.in']
+    }
+  });
 </script>
 
     <style>
@@ -1070,6 +1074,163 @@
             </div>
         </div>
     </footer>
+
+    <!-- GA4 ATTRIBUTION + CTA TRACKING -->
+    <script>
+        (function () {
+            if (typeof gtag !== 'function') return;
+
+            const STORAGE_KEY = 'agnes_attribution';
+            const ATTR_KEYS = [
+                'utm_source',
+                'utm_medium',
+                'utm_campaign',
+                'utm_term',
+                'utm_content',
+                'utm_id',
+                'gclid',
+                'dclid',
+                'gbraid',
+                'wbraid'
+            ];
+
+            function readAttributionFromUrl() {
+                const params = new URLSearchParams(window.location.search);
+                const data = {};
+
+                ATTR_KEYS.forEach(key => {
+                    const value = params.get(key);
+                    if (value) data[key] = value;
+                });
+
+                // Backward-compatible support for the custom format:
+                // ?utm=value
+                // GA4 does NOT treat "utm" itself as a native campaign parameter,
+                // so map it to utm_source only when utm_source is absent.
+                const legacyUtm = params.get('utm');
+                if (legacyUtm && !data.utm_source) {
+                    data.utm_source = legacyUtm;
+                    data.legacy_utm = legacyUtm;
+                }
+
+                return data;
+            }
+
+            function getStoredAttribution() {
+                try {
+                    return JSON.parse(localStorage.getItem(STORAGE_KEY) || '{}');
+                } catch (_) {
+                    return {};
+                }
+            }
+
+            function saveAttribution(data) {
+                if (!Object.keys(data).length) return;
+                try {
+                    localStorage.setItem(STORAGE_KEY, JSON.stringify({
+                        ...getStoredAttribution(),
+                        ...data,
+                        landing_page: window.location.href,
+                        landing_timestamp: new Date().toISOString()
+                    }));
+                } catch (_) {}
+            }
+
+            const currentAttribution = readAttributionFromUrl();
+            const storedAttribution = getStoredAttribution();
+
+            // First-touch attribution: keep the original campaign.
+            if (Object.keys(currentAttribution).length && !storedAttribution.utm_source) {
+                saveAttribution(currentAttribution);
+            }
+
+            // Latest-touch attribution: always remember the latest campaign too.
+            if (Object.keys(currentAttribution).length) {
+                try {
+                    localStorage.setItem('agnes_latest_attribution', JSON.stringify({
+                        ...currentAttribution,
+                        landing_page: window.location.href,
+                        landing_timestamp: new Date().toISOString()
+                    }));
+                } catch (_) {}
+            }
+
+            // Pass attribution to every Agnes app/broker CTA.
+            function decorateAppLinks() {
+                const attribution = {
+                    ...getStoredAttribution(),
+                    ...currentAttribution
+                };
+
+                document.querySelectorAll('a[href*="app.agnes.techvory.in"]').forEach(link => {
+                    try {
+                        const url = new URL(link.href);
+
+                        ATTR_KEYS.forEach(key => {
+                            if (attribution[key]) {
+                                url.searchParams.set(key, attribution[key]);
+                            }
+                        });
+
+                        if (attribution.legacy_utm) {
+                            url.searchParams.set('utm', attribution.legacy_utm);
+                        }
+
+                        link.href = url.toString();
+                    } catch (_) {}
+                });
+            }
+
+            // CTA clicks are tracked with a custom event because the app is a
+            // separate domain and cross-domain measurement may suppress GA4's
+            // automatic outbound "click" event.
+            function trackCtaClicks() {
+                document.querySelectorAll('[data-cta]').forEach(link => {
+                    link.addEventListener('click', function () {
+                        const attribution = {
+                            ...getStoredAttribution(),
+                            ...currentAttribution
+                        };
+
+                        gtag('event', 'cta_click', {
+                            cta_name: this.dataset.cta,
+                            link_id: this.id || undefined,
+                            link_url: this.href,
+                            link_text: (this.textContent || '').trim(),
+                            utm_source: attribution.utm_source || '(direct)',
+                            utm_medium: attribution.utm_medium || '(none)',
+                            utm_campaign: attribution.utm_campaign || '(not set)',
+                            utm_content: attribution.utm_content || '(not set)'
+                        });
+                    });
+                });
+            }
+
+            // Explicitly record campaign arrival only when campaign parameters
+            // are present. Standard UTM parameters are already interpreted by GA4
+            // for traffic attribution; this event is only a convenient audit trail.
+            if (Object.keys(currentAttribution).length) {
+                gtag('event', 'campaign_landing', {
+                    utm_source: currentAttribution.utm_source || undefined,
+                    utm_medium: currentAttribution.utm_medium || undefined,
+                    utm_campaign: currentAttribution.utm_campaign || undefined,
+                    utm_term: currentAttribution.utm_term || undefined,
+                    utm_content: currentAttribution.utm_content || undefined,
+                    utm_id: currentAttribution.utm_id || undefined
+                });
+            }
+
+            if (document.readyState === 'loading') {
+                document.addEventListener('DOMContentLoaded', function () {
+                    decorateAppLinks();
+                    trackCtaClicks();
+                });
+            } else {
+                decorateAppLinks();
+                trackCtaClicks();
+            }
+        })();
+    </script>
 
     <!-- SCRIPTS -->
     <script>
